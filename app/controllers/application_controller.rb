@@ -13,7 +13,7 @@ class ApplicationController < ActionController::Base
     return nil unless auth_header.present?
 
     token = auth_header.split(' ')[1]
-    decoded = JwtService.decode(token) # Use JwtService for decoding
+    decoded = JwtService.decode(token) 
     return nil unless decoded
 
     @current_user = User.find_by(id: decoded[:user_id])
