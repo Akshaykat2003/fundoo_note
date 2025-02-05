@@ -1,8 +1,10 @@
 class User < ApplicationRecord
+
+  
   has_secure_password 
 
   
-  
+
   validates :name, presence: true, format: { with: /\A[a-zA-Z\s]+\z/, message: "only allows letters and spaces" }
   validates :email, presence: true, uniqueness: true, format: { with: /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i, message: "must be a valid email address" }
   validates :password, presence: true, length: { minimum: 8 }, format: { 
@@ -12,12 +14,19 @@ class User < ApplicationRecord
   validates :phone_no, presence: true, format: { with: /\A[6-9]\d{9}\z/, message: "must be a valid Indian phone number (10 digits, starting with 6, 7, 8, or 9)" }
 
   
+
+
+  attr_accessor :otp_expiry
+
   def generate_otp
     otp = rand(100000..999999).to_s
-    self.class.store_otp(email, otp)
-    otp  
+    expiry = 10.minutes.from_now
+    self.class.store_otp(email, otp, expiry)  # Pass expiry
+    expiry_in_kolkata = expiry.in_time_zone('Asia/Kolkata')  # Convert expiry time to IST
+    { otp: otp,otp_expiry: expiry_in_kolkata.to_s }
   end
-
+  
+  
 
   def valid_otp?(entered_otp)
     otp_data = self.class.fetch_otp(email)
@@ -25,6 +34,8 @@ class User < ApplicationRecord
     return false if Time.current > otp_data[:expires_at]
     otp_data[:otp] == entered_otp
   end
+
+
 
   
   def clear_otp
@@ -38,8 +49,8 @@ class User < ApplicationRecord
     @otp_store ||= {}  
   end
 
-  def self.store_otp(email, otp)
-    otp_store[email] = { otp: otp, expires_at: 10.minutes.from_now }
+  def self.store_otp(email, otp,expiry)
+    otp_store[email] = { otp: otp, expires_at: 2.minutes.from_now }
   end
 
   def self.fetch_otp(email)

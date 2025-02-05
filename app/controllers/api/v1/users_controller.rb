@@ -1,6 +1,8 @@
 class Api::V1::UsersController < ApplicationController
   skip_before_action :authenticate_user, only: [:register, :login, :forgot_password, :reset_password]
 
+
+
   def forgot_password
     result = UserService.send_otp(params[:email])
     if result[:success]
@@ -9,6 +11,8 @@ class Api::V1::UsersController < ApplicationController
       render json: { error: result[:error] }, status: :not_found
     end
   end
+
+  
 
   def reset_password
     user = User.find_by(id: params[:id])
@@ -22,6 +26,8 @@ class Api::V1::UsersController < ApplicationController
       render json: { error: result[:error] }, status: :unprocessable_entity
     end
   end
+
+
 
   def register
     result = UserService.register(user_params)
@@ -38,6 +44,7 @@ class Api::V1::UsersController < ApplicationController
     render json: { errors: [e.message] }, status: :bad_request
   end
 
+
   def profile
     result = UserService.fetch_profile(current_user)
     render json: { user: result[:user] }, status: :ok
@@ -45,8 +52,11 @@ class Api::V1::UsersController < ApplicationController
     render json: { errors: [e.message] }, status: :unauthorized
   end
 
-  private
 
+
+
+
+  private
   def user_params
     params.require(:user).permit(:name, :email, :password, :phone_no)
   end
