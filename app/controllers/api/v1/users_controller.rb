@@ -4,28 +4,30 @@ class Api::V1::UsersController < ApplicationController
 
 
   def forgot_password
-    result = UserService.send_otp(params[:email])
-    if result[:success]
-      render json: { message: result[:message] }, status: :ok
-    else
-      render json: { error: result[:error] }, status: :not_found
-    end
-  end
-
-  
-
-  def reset_password
-    user = User.find_by(id: params[:id])
-    return render json: { error: "User not found" }, status: :not_found unless user
-
-    result = UserService.verify_otp_and_reset_password(user.email, params[:otp], params[:new_password])
-  
+    email = params[:email]
+    result = UserService.send_otp(email)
+    
     if result[:success]
       render json: { message: result[:message] }, status: :ok
     else
       render json: { error: result[:error] }, status: :unprocessable_entity
     end
   end
+
+  def reset_password
+    email = params[:email]
+    otp = params[:otp]
+    new_password = params[:new_password]
+    
+    result = UserService.verify_otp_and_reset_password(email, otp, new_password)
+
+    if result[:success]
+      render json: { message: result[:message] }, status: :ok
+    else
+      render json: { error: result[:error] }, status: :unprocessable_entity
+    end
+  end
+
 
 
 
@@ -36,6 +38,7 @@ class Api::V1::UsersController < ApplicationController
     render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
   end
 
+  
   
   def login
     result = UserService.login(params[:email], params[:password])
@@ -51,9 +54,6 @@ class Api::V1::UsersController < ApplicationController
   rescue ActionController::Unauthorized => e
     render json: { errors: [e.message] }, status: :unauthorized
   end
-
-
-
 
 
   private

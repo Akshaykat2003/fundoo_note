@@ -22,6 +22,9 @@ gem 'bcrypt', '~> 3.1', '>= 3.1.12'
 gem 'jwt'
 
 gem 'dotenv-rails', groups: [:development, :test]
+gem 'bunny', '~> 2.4'
+gem 'sidekiq'
+
 
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]

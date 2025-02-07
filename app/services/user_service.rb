@@ -4,30 +4,42 @@ class UserService
   def self.send_otp(email)
     user = User.find_by(email: email)
     return { success: false, error: "User not found" } unless user
-  
-    otp = user.generate_otp 
-    UserMailer.send_otp_email(user, otp).deliver_now  
-  
-    { success: true, message: "OTP sent to your email" }
+
+    # Generate OTP and get expiry time
+    otp_details = user.generate_otp
+    otp = otp_details[:otp]        # Extract OTP
+    otp_expiry = otp_details[:otp_expiry]  # Extract OTP expiry
+
+    # Ensure OTP and OTP expiry are passed to RabbitMQ separately
+    message = { 
+      email: user.email, 
+      type: 'otp_email', 
+      otp: otp, 
+      otp_expiry: otp_expiry 
+    }.to_json
+
+    EXCHANGE.publish(message, routing_key: 'email_notifications', persistent: true)
+
+    { success: true, message: "OTP request sent to RabbitMQ" }
   end
-  
 
 
-def self.verify_otp_and_reset_password(email, otp, new_password)
-  user = User.find_by(email: email)
-  return { success: false, error: "User not found" } unless user
-  return { success: false, error: "Invalid or expired OTP" } unless user.valid_otp?(otp)
+  def self.verify_otp_and_reset_password(email, otp, new_password)
+    user = User.find_by(email: email)
+    return { success: false, error: "User not found" } unless user
+    return { success: false, error: "Invalid or expired OTP" } unless user.valid_otp?(otp)
 
-  if user.update(password: new_password)  
-    user.clear_otp  
-    UserMailer.password_reset_successful(user).deliver_now
-    { success: true, message: "Password reset successfully. A confirmation email has been sent." }
-  else
-    { success: false, error: user.errors.full_messages.join(", ") }
+    if user.update(password: new_password)
+      user.clear_otp  
+
+      # Publish password reset confirmation email job to RabbitMQ
+      EMAIL_QUEUE.publish({ email: user.email, type: "password_reset" }.to_json)
+
+      { success: true, message: "Password reset successfully. A confirmation email has been sent." }
+    else
+      { success: false, error: user.errors.full_messages.join(", ") }
+    end
   end
-end
-
-
 
 
 
@@ -53,13 +65,6 @@ end
       raise ActionController::BadRequest, 'Invalid email or password'
     end
   end
-
-
-
-
-
-
-
 
 
 
