@@ -4,7 +4,7 @@ class UserMailer < ApplicationMailer
   def send_otp_email(user, otp_details)
     @user = user
     @otp = otp_details[:otp]         # Extract OTP from the hash
-    @otp_expiry = otp_details[:otp_expiry]  # Extract OTP expiry from the hash
+    @otp_expiry = otp_details[:otp_expiry].to_datetime   # Extract OTP expiry from the hash
     mail(to: @user.email, subject: 'Your OTP Code')
   end
 

@@ -13,7 +13,7 @@ class User < ApplicationRecord
   }
   validates :phone_no, presence: true, format: { with: /\A[6-9]\d{9}\z/, message: "must be a valid Indian phone number (10 digits, starting with 6, 7, 8, or 9)" }
 
-  
+  has_many :notes, dependent: :destroy
 
 
   attr_accessor :otp_expiry
