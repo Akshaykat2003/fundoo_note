@@ -45,6 +45,7 @@ config.action_mailer.smtp_settings = {
 
 
 config.action_mailer.logger = nil
+config.cache_store = :redis_cache_store, { url: "redis://localhost:6379/0" }
 
 
 

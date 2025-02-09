@@ -1,6 +1,7 @@
 class EmailWorker
   def self.start
     EMAIL_QUEUE.subscribe(manual_ack: true, block: true) do |_delivery_info, _properties, body|
+      
       begin
         data = JSON.parse(body)
         user = User.find_by(email: data["email"])
@@ -23,5 +24,7 @@ class EmailWorker
 end
 
 
-
+if Rails.env.production? || Rails.env.development?
+  Thread.new { EmailWorker.start }
+end
 
