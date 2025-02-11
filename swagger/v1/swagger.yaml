@@ -1,0 +1,241 @@
+openapi: 3.0.1
+info:
+  title: Fundoo Notes API
+  description: API documentation for Funodoo Notes application
+  version: v1
+servers:
+  - url: http://localhost:3000
+    description: Development Server
+
+paths:
+  /api/v1/register:
+    post:
+      summary: Register a new user
+      description: Creates a new user account
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Akshay"
+                email:
+                  type: string
+                  example: "akshay@example.com"
+                password:
+                  type: string
+                  example: "password123"
+                phone_no:
+                  type: string
+                  example: "9919956301"
+      responses:
+        "201":
+          description: User registered successfully
+        "400":
+          description: Invalid parameters
+
+  /api/v1/login:
+    post:
+      summary: Login a user
+      description: Authenticate user and return JWT token
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "akshay@example.com"
+                password:
+                  type: string
+                  example: "password123"
+      responses:
+        "200":
+          description: User logged in successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1..."
+        "401":
+          description: Invalid credentials
+
+  /api/v1/forgot_password:
+    post:
+      summary: Forgot password
+      description: Initiates password reset process
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "akshay@example.com"
+      responses:
+        "200":
+          description: Password reset link sent
+        "400":
+          description: Invalid email
+
+  /api/v1/reset_password:
+    post:
+      summary: Reset password
+      description: Resets user password
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  example: "reset-token"
+                new_password:
+                  type: string
+                  example: "newpassword123"
+      responses:
+        "200":
+          description: Password reset successful
+        "400":
+          description: Invalid or expired token
+
+  /api/v1/profile:
+    get:
+      summary: Get user profile
+      description: Retrieves the authenticated user's profile information
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: User profile retrieved successfully
+        "401":
+          description: Unauthorized access
+
+  /api/v1/notes/create:
+    post:
+      summary: Create a new note
+      description: Adds a new note for the authenticated user
+      tags:
+        - Notes
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: "Shopping List"
+                content:
+                  type: string
+                  example: "Buy groceries"
+                color:
+                  type: string
+                  example: "yellow"
+      responses:
+        "201":
+          description: Note created successfully
+        "400":
+          description: Invalid input data
+
+  /api/v1/notes:
+    get:
+      summary: Get all notes
+      description: Fetches all notes for the authenticated user
+      tags:
+        - Notes
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of notes retrieved successfully
+
+  /api/v1/notes/{id}:
+    get:
+      summary: Get a single note
+      description: Fetches a specific note by ID
+      tags:
+        - Notes
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the note
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Note retrieved successfully
+        "404":
+          description: Note not found
+
+  /api/v1/notes/{id}/update:
+    put:
+      summary: Update a note
+      description: Updates a note's details
+      tags:
+        - Notes
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the note to update
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: "Updated Shopping List"
+                content:
+                  type: string
+                  example: "Buy vegetables and fruits"
+                color:
+                  type: string
+                  example: "green"
+      responses:
+        "200":
+          description: Note updated successfully
+        "404":
+          description: Note not found
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
