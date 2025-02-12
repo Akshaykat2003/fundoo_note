@@ -16,6 +16,16 @@ development:
   password: akshay
 
 
+test:
+  <<: *default
+  database: funodoo_notes_test
+  username: postgres
+  password: akshay
+  host: localhost
+  port: 5432
+
+
+
 
 
 production:

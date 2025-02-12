@@ -24,6 +24,7 @@ class NotesService
 
 
   def self.create_note(user, params)
+    return { success: false, error: "User not found" } if user.nil?
     note = user.notes.build(params)
     note.color ||= 'white'
     note.archived = false if note.archived.nil?
