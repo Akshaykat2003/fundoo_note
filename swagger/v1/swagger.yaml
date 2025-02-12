@@ -72,9 +72,7 @@ paths:
         "401":
           description: Invalid credentials
 
-  /api/v1/forgot_password:
-    post:
-      summary: Forgot password
+t password
       description: Initiates password reset process
       tags:
         - Users

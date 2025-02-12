@@ -115,7 +115,7 @@ class NotesService
     $redis.del("user_#{user.id}_notes")  # Invalidate cache
     $redis.del("user_#{user.id}_note_#{note_id}")  # Invalidate single note cache
     $redis.setex("user_#{user.id}_note_#{note_id}", 600, note.to_json)  # Store updated note
-    
+
     return { success: true, message: "Note color updated", note: note }
   end
 end
