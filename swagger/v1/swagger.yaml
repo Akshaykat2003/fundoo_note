@@ -1,17 +1,16 @@
 openapi: 3.0.1
 info:
-  title: Fundoo Notes API
+  title: Funodoo Notes API
   description: API documentation for Funodoo Notes application
-  version: v1
+  version: 1.0.0
 servers:
-  - url: http://localhost:3000
-    description: Development Server
+  - url: http://localhost:3000/api/v1
+    description: Local server
 
 paths:
-  /api/v1/register:
+  /register:
     post:
       summary: Register a new user
-      description: Creates a new user account
       tags:
         - Users
       requestBody:
@@ -23,26 +22,19 @@ paths:
               properties:
                 name:
                   type: string
-                  example: "Akshay"
                 email:
                   type: string
-                  example: "akshay@example.com"
                 password:
                   type: string
-                  example: "password123"
                 phone_no:
                   type: string
-                  example: "9919956301"
       responses:
         "201":
           description: User registered successfully
-        "400":
-          description: Invalid parameters
 
-  /api/v1/login:
+  /login:
     post:
-      summary: Login a user
-      description: Authenticate user and return JWT token
+      summary: User login
       tags:
         - Users
       requestBody:
@@ -54,26 +46,15 @@ paths:
               properties:
                 email:
                   type: string
-                  example: "akshay@example.com"
                 password:
                   type: string
-                  example: "password123"
       responses:
         "200":
-          description: User logged in successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  token:
-                    type: string
-                    example: "eyJhbGciOiJIUzI1..."
-        "401":
-          description: Invalid credentials
+          description: Login successful
 
-t password
-      description: Initiates password reset process
+  /forgot_password:
+    post:
+      summary: Forgot password
       tags:
         - Users
       requestBody:
@@ -85,17 +66,13 @@ t password
               properties:
                 email:
                   type: string
-                  example: "akshay@example.com"
       responses:
         "200":
           description: Password reset link sent
-        "400":
-          description: Invalid email
 
-  /api/v1/reset_password:
+  /reset_password:
     post:
       summary: Reset password
-      description: Resets user password
       tags:
         - Users
       requestBody:
@@ -107,34 +84,26 @@ t password
               properties:
                 token:
                   type: string
-                  example: "reset-token"
                 new_password:
                   type: string
-                  example: "newpassword123"
       responses:
         "200":
           description: Password reset successful
-        "400":
-          description: Invalid or expired token
 
-  /api/v1/profile:
+  /profile:
     get:
       summary: Get user profile
-      description: Retrieves the authenticated user's profile information
       tags:
         - Users
       security:
         - bearerAuth: []
       responses:
         "200":
-          description: User profile retrieved successfully
-        "401":
-          description: Unauthorized access
+          description: Successfully retrieved user profile
 
-  /api/v1/notes/create:
+  /notes/create:
     post:
       summary: Create a new note
-      description: Adds a new note for the authenticated user
       tags:
         - Notes
       security:
@@ -148,35 +117,28 @@ t password
               properties:
                 title:
                   type: string
-                  example: "Shopping List"
                 content:
                   type: string
-                  example: "Buy groceries"
                 color:
                   type: string
-                  example: "yellow"
       responses:
         "201":
           description: Note created successfully
-        "400":
-          description: Invalid input data
 
-  /api/v1/notes:
+  /notes:
     get:
       summary: Get all notes
-      description: Fetches all notes for the authenticated user
       tags:
         - Notes
       security:
         - bearerAuth: []
       responses:
         "200":
-          description: List of notes retrieved successfully
+          description: Successfully retrieved all notes
 
-  /api/v1/notes/{id}:
+  /notes/{id}:
     get:
-      summary: Get a single note
-      description: Fetches a specific note by ID
+      summary: Get a note by ID
       tags:
         - Notes
       security:
@@ -185,19 +147,14 @@ t password
         - name: id
           in: path
           required: true
-          description: ID of the note
           schema:
             type: integer
       responses:
         "200":
-          description: Note retrieved successfully
-        "404":
-          description: Note not found
+          description: Successfully retrieved the note
 
-  /api/v1/notes/{id}/update:
     put:
       summary: Update a note
-      description: Updates a note's details
       tags:
         - Notes
       security:
@@ -206,7 +163,6 @@ t password
         - name: id
           in: path
           required: true
-          description: ID of the note to update
           schema:
             type: integer
       requestBody:
@@ -218,18 +174,73 @@ t password
               properties:
                 title:
                   type: string
-                  example: "Updated Shopping List"
                 content:
                   type: string
-                  example: "Buy vegetables and fruits"
                 color:
                   type: string
-                  example: "green"
       responses:
         "200":
           description: Note updated successfully
-        "404":
-          description: Note not found
+
+  /notes/{id}/trash:
+    post:
+      summary: Move note to trash
+      tags:
+        - Notes
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Note moved to trash
+
+  /notes/{id}/archive:
+    post:
+      summary: Archive a note
+      tags:
+        - Notes
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Note archived successfully
+
+  /notes/{id}/change_color:
+    post:
+      summary: Change note color
+      tags:
+        - Notes
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                color:
+                  type: string
+      responses:
+        "200":
+          description: Note color updated successfully
 
 components:
   securitySchemes:

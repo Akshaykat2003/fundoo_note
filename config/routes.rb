@@ -6,8 +6,7 @@ Rails.application.routes.draw do
       # User-related routes
       post 'register', to: 'users#register'
       post 'login', to: 'users#login'
-      # post 'forgot_password', to: 'users#forgot_password'
-      # post 'reset_password/:id', to: 'users#reset_password'
+   
       post 'forgot_password', to: 'users#forgot_password'
       post 'reset_password', to: 'users#reset_password' 
       get  'profile', to: 'users#profile'
