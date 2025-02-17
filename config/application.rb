@@ -10,7 +10,8 @@ module FundooNotess
     # config.active_job.queue_adapter = :sidekiq
 
     config.autoload_lib(ignore: %w[assets tasks])
-
+    
+    config.autoload_paths << Rails.root.join('app/services')
     # 🚀 Log a message instead of trying to start Redis automatically
     config.before_initialize do
       puts "⚠️  Make sure Redis is running before starting Rails."
