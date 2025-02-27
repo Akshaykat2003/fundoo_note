@@ -25,6 +25,12 @@ gem 'dotenv-rails', groups: [:development, :test]
 gem 'bunny', '~> 2.4'
 gem 'sidekiq'
  gem "redis", "~> 5.3"
+ # Gemfile
+gem 'rack-cors'
+
+# Run bundle install
+
+
 
 
 

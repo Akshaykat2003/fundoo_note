@@ -9,7 +9,7 @@ Rails.application.routes.draw do
    
       post 'forgot_password', to: 'users#forgot_password'
       post 'reset_password', to: 'users#reset_password' 
-      get  'profile', to: 'users#profile'
+      # get  'profile', to: 'users#profile'
 
         
       # Notes-related routes
@@ -21,7 +21,6 @@ Rails.application.routes.draw do
       post 'notes/:id/archive', to: 'notes#archive'           # Toggle archive status
       post 'notes/:id/change_color', to: 'notes#change_color' # Change note color
 
-    
     end
   end
 end

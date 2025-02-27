@@ -17,6 +17,7 @@ RSpec.describe "Notes API", type: :request do
     end
   end
 
+
   describe "POST /api/v1/notes/create" do
     let(:valid_params) { { note: { title: "Test Note", content: "This is a test note" } } }
     let(:invalid_params) { { note: { title: "" } } }

@@ -1,6 +1,7 @@
 class Api::V1::UsersController < ApplicationController
   skip_before_action :authenticate_user, only: [:register, :login, :forgot_password, :reset_password]
 
+  
   def forgot_password
     result = UserService.send_otp(params[:email])
 
@@ -10,6 +11,7 @@ class Api::V1::UsersController < ApplicationController
       render json: { error: result[:error] }, status: :unprocessable_entity
     end
   end
+
 
   def reset_password
     result = UserService.verify_otp_and_reset_password(params[:email], params[:otp], params[:new_password])
@@ -21,25 +23,42 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 
+
+
   def register
+    Rails.logger.info " Incoming parameters: #{user_params.inspect}"
+    
     result = UserService.register(user_params)
     
+    Rails.logger.info " Service result: #{result.inspect}"
+    
     if result[:success]
+      Rails.logger.info "User registered successfully: #{result[:user].inspect}"
       render json: { message: 'User registered successfully', user: result[:user] }, status: :created
     else
+      Rails.logger.info " Registration failed: #{result[:error].inspect}"
       render json: { errors: result[:error] }, status: :unprocessable_entity
     end
   end
+  
+
+
 
   def login
+    Rails.logger.info "Attempting login for email: \#{params[:email]}"
     result = UserService.login(params[:email], params[:password])
 
     if result[:success]
+      Rails.logger.info "Login successful for user: \#{result[:user].email}"
       render json: { message: 'Login successful', user: result[:user], token: result[:token] }, status: :ok
     else
+      Rails.logger.info "Login failed: \#{result[:error]}"
       render json: { errors: result[:error] }, status: :unauthorized
     end
+
   end
+
+
 
   def profile
     result = UserService.fetch_profile(current_user)
