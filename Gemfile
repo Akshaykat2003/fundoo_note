@@ -24,7 +24,7 @@ gem 'jwt'
 gem 'dotenv-rails', groups: [:development, :test]
 gem 'bunny', '~> 2.4'
 gem 'sidekiq'
- gem "redis", "~> 5.3"
+ gem "redis", "~> 5.4"
  # Gemfile
 gem 'rack-cors'
 
@@ -86,7 +86,7 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "redis", "~> 5.3"
+gem "redis", "~> 5.4"
 
 
 #swaggerui
