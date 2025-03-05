@@ -134,15 +134,20 @@ class UserService
   def self.verify_otp_and_reset_password(email, otp, new_password)
     user = User.find_by(email: email)
     return { success: false, error: "User not found" } unless user
+
+    Rails.logger.info "Validating OTP for user: #{user.email}, OTP: #{otp}, Expiry: #{user.otp_expiry}"
     return { success: false, error: "Invalid or expired OTP" } unless user.valid_otp?(otp)
 
-    if user.update(password: new_password)
-      user.clear_otp  
-      EMAIL_QUEUE.publish({ email: user.email, type: "password_reset" }.to_json)
+    Rails.logger.info "Updating password for user: #{user.email}, New Password: #{new_password.inspect}"
+    if new_password.present? && user.update(password: new_password)
+        user.clear_otp
+        EMAIL_QUEUE.publish({ email: user.email, type: "password_reset" }.to_json) rescue Rails.logger.error "Failed to publish password reset notification to RabbitMQ"
 
-      { success: true, message: "Password reset successfully. A confirmation email has been sent." }
+        { success: true, message: "Password reset successfully. A confirmation email has been sent." }
     else
-      { success: false, error: user.errors.full_messages.join(", ") }
+        Rails.logger.error "Password update failed: #{user.errors.full_messages.join(', ')}"
+        { success: false, error: user.errors.full_messages.join(", ") }
     end
-  end
+end
+
 end

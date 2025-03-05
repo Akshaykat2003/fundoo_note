@@ -13,15 +13,26 @@ class Api::V1::UsersController < ApplicationController
   end
 
 
-  def reset_password
-    result = UserService.verify_otp_and_reset_password(params[:email], params[:otp], params[:new_password])
 
+  def reset_password
+    Rails.logger.info "Received parameters: #{params.inspect}"
+    
+    email = params.dig(:user, :email)
+    new_password = params.dig(:user, :password)
+    otp = params[:otp]
+  
+    Rails.logger.info "Extracted email: #{email}, OTP: #{otp}"
+  
+    result = UserService.verify_otp_and_reset_password(email, otp, new_password)
+  
     if result[:success]
       render json: { message: result[:message] }, status: :ok
     else
       render json: { error: result[:error] }, status: :unprocessable_entity
     end
   end
+  
+
 
 
 
@@ -69,6 +80,8 @@ class Api::V1::UsersController < ApplicationController
       render json: { error: result[:error] }, status: :unauthorized
     end
   end
+
+  
 
   private
 
